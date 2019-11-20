@@ -2,101 +2,84 @@ package Comp250_Ass1;
 
 
 public class Basket {
-    private MarketProduct[] products; //an array of market products containing string;
+    private MarketProduct[] products;
 
-
-
-    @SuppressWarnings("unchecked")
     public Basket() {
-
-        products = new MarketProduct[0]; // I think this one is the real empty array
+         products = new MarketProduct[0]; //initialize the field with an empty array.
     }
 
-    public MarketProduct[] getProducts() {
-
-        //shallow copy = creates a new instance --> copies all the field of the object to it --> returns as a object type
-        MarketProduct[] proLen = new MarketProduct[products.length];
-        MarketProduct[] shallow_array = proLen.clone();
-        return shallow_array;
+    public MarketProduct[] getProducts(){
+        MarketProduct[] coppyArray = new MarketProduct[]{};
+        System.arraycopy(products, 0, coppyArray, 0, coppyArray.length);
+        return coppyArray;
     }
 
-    public void add(MarketProduct marketProduct){
-        @SuppressWarnings("unchecked")
-        MarketProduct[] shallow_array = new MarketProduct[products.length +1];
-        //copy everything over to the new array
-        for(int i = 0; i < products.length; i++){
-            shallow_array[i] = products[i];
-        }
-        //add the new element
-        shallow_array[shallow_array.length - 1] = marketProduct;
-        products = shallow_array;
+
+    public void add(MarketProduct mp){
+        MarketProduct[] coppyArray = new MarketProduct[products.length+1];
+        System.arraycopy(products, 0, coppyArray, 0, products.length);
+
+        coppyArray[coppyArray.length-1]= mp;
+        products=coppyArray;
     }
 
-    public boolean remove(MarketProduct marketProduct){
-        boolean found = false;
-        for(int i = 0; i < products.length; i++) {
-            if (products[i].equals(marketProduct)) {
-                found = true;
-                return found;
 
+    public boolean remove(MarketProduct mp){
+        for (int i = 0; i< products.length; i++){
+            if(products[i].equals(mp)) {
+                MarketProduct[] copyArray = new MarketProduct[products.length-1];
+                System.arraycopy(products, 0, copyArray, 0, i);
+                System.arraycopy(products, i + 1, copyArray, i, copyArray.length - i);
+                products = copyArray;
+                return true;
             }
         }
-
-        return found;
-    }
-    public void clear() {
-        removeAllElements();
+        return false;
     }
 
-    public synchronized void removeAllElements() {
-        for (int i = 0; i < products.length; i++) {
-            products[i] = null;
-        }
+
+    public void clear(){
+        products = new MarketProduct[0];
+    }
+
+    public int getNumOfProducts(){
+        return products.length;
 
     }
-    public int getNumofProducts(){
-        int counter = 0;
-        for (int i = 0; i < products.length; i ++)
-            if (products[i] != null)
-                counter ++;
-        return counter;  //returning the count of products in myArray
-    }
+
 
     public int getSubTotal(){
-        int total = 0;
-        for(MarketProduct product: products){
-            total+= product.getCost();
+        int cost=0;
+        for(int i = 0; i< products.length; i++){
+            cost = cost + products[i].getCost();
         }
-
-    return total;
+        return cost;
     }
+
 
     public int getTotalTax(){
-        MarketProduct m1;
-        for(int i=0 ; i< products.length; i++){
-            m1= products[i];
-            if(m1 instanceof Jam ){
-                int cost= (int) (products[i].getCost() * 0.15);
-                return cost;
+        int tax =0;
+        for(int i = 0; i< products.length; i++){
+            if(products[i] instanceof Jam){
+                tax = tax + products[i].getCost();
             }
         }
-        return 0;
+        tax = (int) (tax *1.15);
+        return tax;
     }
 
+
     public int getTotalCost(){
-        int totalCost=0;
-        for(MarketProduct product: products){
-            totalCost = product.getCost() + getTotalTax();
-        }
+        int totalCost = getSubTotal()+getTotalTax();
         return totalCost;
     }
 
+
     @Override
-    public String toString(){
+    public String toString() {
         StringBuilder output = new StringBuilder();
 
         for (MarketProduct product: products) {
-
             output.append(product.getName() + '\t' +
                     (product.getCost() <= 0 ? '-' : String.format("%.2f", product.getCost() / 100.0))).append('\n');
 
@@ -106,9 +89,6 @@ public class Basket {
         output.append("\n\nTotal cost\t" + String.format("%.2f", getTotalCost() / 100.0));
 
         return output.toString();
-
     }
-
-
 
 }
